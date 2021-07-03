@@ -13,3 +13,7 @@ https://github.com/ipfs/js-ipfs/blob/master/docs/BROWSERS.md#addressing-limitati
 Here's some suggestion about best practices to follow when you want to use IPFS in the browser (creating an instance, we'll adress that in react later on) : 
 
 https://github.com/ipfs/js-ipfs/blob/master/docs/BROWSERS.md#best-practices
+
+For that, you need to run your own "rendezvous" server, wtf is a rendezvous server ? 
+
+https://en.wikipedia.org/wiki/Rendezvous_protocol
