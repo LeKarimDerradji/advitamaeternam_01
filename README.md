@@ -16,4 +16,6 @@ https://github.com/ipfs/js-ipfs/blob/master/docs/BROWSERS.md#best-practices
 
 For that, you need to run your own "rendezvous" server, wtf is a rendezvous server ? 
 
+It basically allows P2P nodes to discover and "handshakes" each others. 
+
 https://en.wikipedia.org/wiki/Rendezvous_protocol
