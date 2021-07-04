@@ -10,7 +10,16 @@ export const IpfsContextProvider = ({ children }) => {
 
   useEffect(() => {
     async function fetchData() {
-      let ipfs = await create();
+      let ipfs = await create({
+        config: {
+          Addresses: {
+            Swarm: [
+              '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
+              '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star'
+            ]
+          }
+        }
+      });
       setIpfs(ipfs);
     }
     fetchData();
@@ -28,6 +37,29 @@ export const IpfsContextProvider = ({ children }) => {
     return cid.cid.string;
   }
 
+  async function addFile(file) {
+    const cid = await ipfs.add(
+      {
+        path: `${file.name}`,
+        content: file,
+        mtime: new Date(),
+      },
+      { wrapWithDirectory: true, cidVersion: 1, hashAlg: "sha2-256" }
+    );
+    return cid.cid.string;
+  }
+
+  async function getURLofImageFromCid(cid) {
+    try {
+      for await (const file of ipfs.ls(cid)) {
+        let filePath = file.path.replace (/^/,'https://dweb.link/ipfs/');
+        return filePath
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   async function getMetadataFromCid(cid) {
     try {
       const data = await ipfs.cat(
@@ -42,7 +74,7 @@ export const IpfsContextProvider = ({ children }) => {
   }
 
   return (
-    <IpfsContext.Provider value={{ ipfs, addMetadata, getMetadataFromCid }}>
+    <IpfsContext.Provider value={{ ipfs, addMetadata, getMetadataFromCid, addFile, getURLofImageFromCid }}>
       {children}
     </IpfsContext.Provider>
   );

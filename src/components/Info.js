@@ -12,26 +12,47 @@ import {
   Spinner,
   FormControl,
   FormLabel,
+  Image,
 } from '@chakra-ui/react';
 
 const Info = () => {
   const [web3State] = useContext(Web3Context);
   const aeternam = useContext(AeternamContext);
-  const { ipfs, getMetadataFromCid } = useContext(IpfsContext);
+  const { ipfs, getMetadataFromCid, getURLofImageFromCid} = useContext(IpfsContext);
   const [tokenID, setTokenID] = useState();
   const [uri, setTokenURI] = useState();
   const [cid, setCID] = useState();
   const [metadata, setMetadata] = useState();
+  const [file, setFile] = useState()
+  const [imageURL, setImageURL] = useState();
+  const [metadataObject, setMetadataObject] = useState()
 
   const handleClickGetURI = async () => {
     const tx = await aeternam.tokenURI(tokenID);
     setTokenURI(tx);
-    console.log(uri);
   };
 
   const handleOnClickResolveCid = async () => {
     let metadataFromCid = await getMetadataFromCid(cid);
     setMetadata(metadataFromCid);
+  };
+
+  const handleGetMetadataFromId = async () => {
+   const metadataURI = await aeternam.tokenURI(tokenID);
+    console.log(metadataURI)
+    let metadata = metadataURI.replace(/^ipfs:\/\//, 'https://dweb.link/ipfs/');
+    console.log('after replace' + metadata)
+    metadata = await fetch(metadata);
+    console.log('after fetch' +metadata)
+    metadata = await metadata.json();
+    console.log('after .json' + metadata.name)
+    setMetadataObject(metadata)
+    if(metadata.image) {
+      const imageURL = await getURLofImageFromCid(metadata.image)
+      console.log(imageURL)
+      setImageURL(imageURL)
+    }
+   
   };
 
   return (
@@ -86,6 +107,30 @@ const Info = () => {
           </Button>
 
           <Text>Metadata : {metadata}</Text>
+
+          <FormControl id="metadataFromTokenID" isRequired>
+            <FormLabel>Metadata from Token ID</FormLabel>
+            <Input
+              type="text"
+              size="lg"
+              colorScheme="purple"
+              placeholder="Token ID"
+              onChange={(e) => setTokenID(e.target.value)}
+            />
+          </FormControl>
+          <Button
+            mt="5px=
+            "
+            colorScheme="blue"
+            onClick={handleGetMetadataFromId}
+          >
+            Get Metadata From Token ID
+          </Button>
+          <Text>Name : {metadataObject ? metadataObject.name : ''}</Text>
+          <Text>Last name : {metadataObject ? metadataObject.lastName : ''}</Text>
+          <Text>Author's address : {metadataObject ? metadataObject.author : ''}</Text>
+          <Text>Content : {metadataObject ? metadataObject.content : ''}</Text>
+          <Image src={imageURL}></Image>
         </Container>
       ) : (
         <Box
